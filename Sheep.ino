@@ -111,36 +111,39 @@ void loop(void)
 
     loadUint16(  address16LSB,5);
 
-    loadUint16(  adc0 ,12); //loads the four ADC values to slots in char array
-    udpBuffer[11]=44;    //setting Comma
-    loadUint16(  adc1 ,18);
-    udpBuffer[17]=44;
-    loadUint16(  adc2 ,24);
+    loadUint16(  adc0 ,16); //loads the four ADC values to slots in char array
+    udpBuffer[15]=44;    //setting Comma
+    loadUint16(  adc1 ,24);
     udpBuffer[23]=44;
-    loadUint16(  adc3 ,30);
-    udpBuffer[29]=44;
+    loadUint16(  adc2 ,32);
+    udpBuffer[31]=44;
+    loadUint16(  adc3 ,40);
+    udpBuffer[39]=44;
     for (int i=0;i<40;i++){ //printing the array sent to UDP for test purposes
       display.setCursor(0+(i%15)*7,25+(i/15)*10);
       display.print(udpBuffer[i]);
     }
   Udp.beginPacket(broadcast_ip, 56700);
   Udp.print(udpBuffer);
-
   Udp.endPacket();
     display.display();
   delay(1000);
 }
 
 void loadUint16(int16_t inputvalue,int16_t index){ //converts a two byte 16 bit value into 4 decimal digits and loads that to array
- char workingBuffer[4];
- workingBuffer[0]=inputvalue/1000;
- int16_t remainder = inputvalue-workingBuffer[0]*1000;
- workingBuffer[1]=remainder/100;
- remainder = remainder-workingBuffer[1]*100;
-  workingBuffer[2]=remainder/10;
- remainder = remainder-workingBuffer[2]*10;
- workingBuffer[3]=remainder;
- for (int i=0;i<4;i++){
+ char workingBuffer[6];
+ workingBuffer[0]=inputvalue/100000;
+ int16_t remainder = inputvalue-workingBuffer[0]*100000;
+ workingBuffer[1]=remainder/10000;
+ remainder = remainder-workingBuffer[1]*10000;
+  workingBuffer[2]=remainder/1000;
+ remainder = remainder-workingBuffer[2]*1000;
+ workingBuffer[3]=remainder/100;
+ remainder = remainder-workingBuffer[3]*100;
+ workingBuffer[4]=remainder/10;
+remainder = remainder-workingBuffer[4]*10;
+workingBuffer[5]=remainder;
+ for (int i=0;i<6;i++){
   udpBuffer[index+i]=workingBuffer[i]+48; //plus 48 to convert from byte to Ascci char that is human readable.
  }
 }
